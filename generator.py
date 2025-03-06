@@ -3,6 +3,7 @@ import string, random
 
 # include payload generators
 from generators.xgen import XssGen
+from generators.php import PHPCodeInjectionGenerator
 
 
 def parse_arguments():
@@ -10,8 +11,8 @@ def parse_arguments():
 
     subparsers = parser.add_subparsers(dest="payload_type", help="Select Option")
     
-
-    xss_parser = subparsers.add_parser("xss", help="Generate XSS PAyloads")
+    # ---------------------------------- [ XSS Parsing ] -----------------------------------------
+    xss_parser = subparsers.add_parser("xss", help="Generate XSS Payloads")
     xss_payload_selector = xss_parser.add_argument_group("XSS Payload Types")
     xss_payload_selector.add_argument("--popup", dest="popup_payloads", action="store_true", help="Generate Popup Payloads")
     xss_payload_selector.add_argument("--logger", dest="logger_payloads", action="store_true", help="Generate Console.log() Payloads")
@@ -29,6 +30,16 @@ def parse_arguments():
     xss_mutator.add_argument("--reverse-payloads", dest="reverse_payloads", action="store_true", help="Generate Reverse Payloads")
     xss_mutator.add_argument("--urlencode",dest="urlencode", action="store_true", help="Set URL Encoding for payload generator")
     
+    # ---------------------------------- [ PHP Code Injection Parsing ] -----------------------------------------
+    
+    php_parser = subparsers.add_parser("php", help="Generate PHP Code Injection Payloads")
+    php_options = php_parser.add_argument_group("PHP CI Payload Options")
+    php_options.add_argument("--oast-domain", dest="oast_domain", metavar="", help="Set OAST Domain for payloads")
+    php_options.add_argument("--unique-string", dest="unique_string", metavar="", help="Set Unique String for testing")
+    php_options.add_argument("--sleep-timeout", dest="sleep_timeout", metavar="" , type=int, help="Set Sleep Timeout")
+
+    php_mutator = php_parser.add_argument_group("PHP Payload Mutations")
+    php_mutator.add_argument("--urlencode",dest="urlencode", action="store_true", help="Set URL Encoding for payload generator")
 
     return parser.parse_args()
 
@@ -40,8 +51,7 @@ def main():
 
     result_payloads = []
     
-    #if args.sleep_timeout: sleep_timeout = args.sleep_timeout
-    
+
 
     if args.payload_type == 'xss':
         if args.oast_domain: oast_domain = args.oast_domain
@@ -73,6 +83,19 @@ def main():
 
         if args.ored_payloads:
             result_payloads.extend(xss.generate_ored_payloads())
+
+    if args.payload_type == 'php':
+        if args.oast_domain: oast_domain = args.oast_domain
+        if args.unique_string: unique_string = args.unique_string
+        if args.sleep_timeout: sleep_timeout = args.sleep_timeout
+        
+        php = PHPCodeInjectionGenerator()
+        php.unique_string = unique_string
+        php.url_encode_payloads = args.urlencode if args.urlencode else False 
+        php.domain = oast_domain
+
+
+        result_payloads.extend(php.generate_payloads())
 
 
 
