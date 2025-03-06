@@ -1,8 +1,14 @@
 # Payload Generator
-Payload Generator Tool
+Payload Generator Tool. These payloads are only help to detect the vulnerability. 
 
 - [x] XSS Payload Generation
-
+- [ ] SSTI Payload Generation
+- [ ] HTML Injection Payload Generation
+- [ ] Open Redirection Payload Generation
+- [ ] SQL Injection Payload Generation
+- [ ] Command Injection Payload Generation
+- [ ] SSI Injection Payload Generation
+- [ ] PHP Code Injection Payload Generation
 
 
 
