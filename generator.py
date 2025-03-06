@@ -4,6 +4,7 @@ import string, random
 # include payload generators
 from generators.xgen import XssGen
 from generators.php import PHPCodeInjectionGenerator
+from generators.ored import OpenRedirectionPayloadGenerator
 
 
 def parse_arguments():
@@ -40,6 +41,20 @@ def parse_arguments():
 
     php_mutator = php_parser.add_argument_group("PHP Payload Mutations")
     php_mutator.add_argument("--urlencode",dest="urlencode", action="store_true", help="Set URL Encoding for payload generator")
+
+
+    # ---------------------------------- [ Open Redirection Parsing ] -----------------------------------------
+    
+    php_parser = subparsers.add_parser("ored", help="Generate Open Redirection Payloads")
+    php_options = php_parser.add_argument_group("Open Redirection Payload Options")
+    php_options.add_argument("--oast-domain", dest="oast_domain", metavar="", help="Set OAST Domain for payloads")
+    php_options.add_argument("--unique-string", dest="unique_string", metavar="", help="Set Unique String for testing")
+    php_options.add_argument("--whitelisted-domain", dest="whitelisted_domain", metavar="", help="Set Whitelisted domain for testing")
+    php_options.add_argument("--xss-payloads", dest="xss_payloads", action="store_true", help="Generate XSS Payloads")
+    
+    php_mutator = php_parser.add_argument_group("Open Redirection Payload Mutations")
+    php_mutator.add_argument("--urlencode",dest="urlencode", action="store_true", help="Set URL Encoding for payload generator")
+
 
     return parser.parse_args()
 
@@ -99,6 +114,21 @@ def main():
         result_payloads.extend(php.generate_payloads())
 
 
+    if args.payload_type == 'ored':
+        if args.oast_domain: oast_domain = args.oast_domain
+        if args.unique_string: unique_string = args.unique_string
+
+        
+        ored = OpenRedirectionPayloadGenerator()
+        ored.unique_string = unique_string
+        ored.url_encode = args.urlencode if args.urlencode else False 
+        ored.domain = oast_domain
+        if args.whitelisted_domain: ored.whitelisted = args.whitelisted_domain 
+        
+        if args.xss_payloads:
+            result_payloads.extend(ored.generate_xss_payloads())
+        else:
+            result_payloads.extend(ored.generate_payloads())
 
     for payload in result_payloads:
         print(payload)

