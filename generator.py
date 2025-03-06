@@ -93,6 +93,7 @@ def main():
         php.unique_string = unique_string
         php.url_encode_payloads = args.urlencode if args.urlencode else False 
         php.domain = oast_domain
+        php.sleep_timeout = sleep_timeout
 
 
         result_payloads.extend(php.generate_payloads())

