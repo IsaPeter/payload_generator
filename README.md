@@ -199,3 +199,25 @@ ${7*"dML9BHG7cEaAjv3sMyXQ"}
 @{Response.Write("dML9BHG7cEaAjv3sMyXQ");}
 <%1337*1337%>
 ```
+
+## SQL Injection
+
+### Help
+
+```bash
+usage: generator.py sqli [-h] [--error-based] [--time-based] [--union-based] [--auth-bypass] [--sleep-timeout]
+
+options:
+  -h, --help        show this help message and exit
+
+SQL Injection Payload Types:
+  --error-based     Generate Error Based payloads
+  --time-based      Generate Time Based payloads
+  --union-based     Generate Union Based payloads
+  --auth-bypass     Generate Auth Bypass payloads
+
+SQL Injection Payload Options:
+  --sleep-timeout   Set Sleep Timeout for payload genrating
+```
+
+
