@@ -8,6 +8,7 @@ from generators.ored import OpenRedirectionPayloadGenerator
 from generators.ssti import TemplateInjectionGenerator
 from generators.sqli import SQLIGenerator
 from generators.ssi import SSIPayloadGenerator
+from generators.traversal import DirectoryTraversalPayloadGenerator
 
 
 def parse_arguments():
@@ -119,6 +120,28 @@ def parse_arguments():
     
     ssi_mutator = ssi_parser.add_argument_group("SSI Payload Mutations")
     ssi_mutator.add_argument("--urlencode",dest="urlencode", action="store_true", help="Set URL Encoding for payload generator")
+
+
+     # ---------------------------------- [ Directory Traversal Parsing ] -----------------------------------------
+    
+    dt_parser = subparsers.add_parser("traversal", help="File & Path Traversal Payloads")
+    dt_payload_selector = dt_parser.add_argument_group("File & Path Traversal Payload Types")
+    dt_payload_selector.add_argument("--file-traversal", dest="file_traversal", action="store_true", help="Generate File Traversal Payloads")
+    dt_payload_selector.add_argument("--path-traversal", dest="path_traversal", action="store_true", help="Generate Path Traversal Payloads")
+    dt_payload_selector.add_argument("--all", dest="all_traversal", action="store_true", help="Generate All Traversal Payloads")
+
+
+    dt_payload_options = dt_parser.add_argument_group("File & Path Traversal Payload Options")
+    dt_payload_options.add_argument("--depth", dest="traversal_depth", metavar="", type=int, default=8, help="Generated Traversal Depth")
+    dt_payload_options.add_argument("--custom-file", dest="custom_file", nargs="+", action="extend", help="Generated Traversal Depth")
+    dt_payload_options.add_argument("--custom-path", dest="custom_path", nargs="+", action="extend", help="Generated Traversal Depth")
+
+    dt_platform_selector = dt_parser.add_argument_group("File & Path Traversal Platform Options")
+    dt_platform_selector.add_argument("-w","--windows", dest="windows_platform", action="store_true", help="Generate Windows Based payloads")
+    dt_platform_selector.add_argument("-l","--linux", dest="linux_platform", action="store_true", help="Generate Linux Based payloads")
+    
+    dt_mutator = dt_parser.add_argument_group("File & Path Traversal Payload Mutations")
+    dt_mutator.add_argument("--urlencode", dest="urlencode", action="store_true", help="Set URL Encoding for Payloads")
 
     return parser.parse_args()
 
@@ -268,6 +291,40 @@ def main():
 
         if args.oast_payloads:
             result_payloads.extend(ssi.generate_oast_payloads())
+
+    if args.payload_type == 'traversal':
+        
+        dt = DirectoryTraversalPayloadGenerator()
+        if args.traversal_depth: dt.depth = args.traversal_depth
+        if args.urlencode: dt.url_encode_payload = True 
+        
+        
+        if args.windows_platform and args.linux_platform or not args.linux_platform and not args.windows_platform:
+            dt.platforms = ['linux', 'windows']
+        
+        if args.windows_platform and not args.linux_platform:
+            dt.platforms = ["windows"]
+        
+        if not args.windows_platform and args.linux_platform:
+            dt.platforms = ["linux"]
+
+        # Custom file processation placed here to override platform settings at above
+
+        if args.custom_file:
+            dt.os_files.extend([('custom',f) for f in args.custom_file])
+            dt.platforms = ["custom"]
+        if args.custom_path:
+            dt.os_paths.extend([('custom',f) for f in args.custom_path])
+            dt.platforms = ["custom"]
+
+        # Generate payloads
+        if args.file_traversal:
+            result_payloads.extend(dt.generate_file_payloads())
+        if args.path_traversal:
+            result_payloads.extend(dt.generate_path_payloads())
+        if args.all_traversal:
+            result_payloads.extend(dt.generate_all_payloads())
+
 
 
 

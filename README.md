@@ -9,7 +9,7 @@ Payload Generator Tool. These payloads are only help to detect the vulnerability
 - [ ] Command Injection Payload Generation
 - [x] SSI Injection Payload Generation
 - [x] PHP Code Injection Payload Generation
-
+- [x] File & Path Traversal Payload Generation
 
 
 ## XSS Payloads
@@ -249,3 +249,35 @@ SSI Platform Options:
 SSI Payload Mutations:
   --urlencode       Set URL Encoding for payload generator
 ```
+
+## File & Path Traversal
+
+### Help
+
+```bash
+usage: generator.py traversal [-h] [--file-traversal] [--path-traversal] [--all] [--depth] [--custom-file CUSTOM_FILE [CUSTOM_FILE ...]] [--custom-path CUSTOM_PATH [CUSTOM_PATH ...]] [-w] [-l] [--urlencode]
+
+options:
+  -h, --help            show this help message and exit
+
+File & Path Traversal Payload Types:
+  --file-traversal      Generate File Traversal Payloads
+  --path-traversal      Generate Path Traversal Payloads
+  --all                 Generate All Traversal Payloads
+
+File & Path Traversal Payload Options:
+  --depth               Generated Traversal Depth
+  --custom-file CUSTOM_FILE [CUSTOM_FILE ...]
+                        Generated Traversal Depth
+  --custom-path CUSTOM_PATH [CUSTOM_PATH ...]
+                        Generated Traversal Depth
+
+File & Path Traversal Platform Options:
+  -w, --windows         Generate Windows Based payloads
+  -l, --linux           Generate Linux Based payloads
+
+File & Path Traversal Payload Mutations:
+  --urlencode           Set URL Encoding for Payloads
+```
+
+
