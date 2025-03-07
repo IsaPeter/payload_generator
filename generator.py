@@ -6,6 +6,7 @@ from generators.xgen import XssGen
 from generators.php import PHPCodeInjectionGenerator
 from generators.ored import OpenRedirectionPayloadGenerator
 from generators.ssti import TemplateInjectionGenerator
+from generators.sqli import SQLIGenerator
 
 
 def parse_arguments():
@@ -82,6 +83,19 @@ def parse_arguments():
     
     ssti_mutator = ssti_parser.add_argument_group("Server Side Template Injection Payload Mutations")
     ssti_mutator.add_argument("--urlencode",dest="urlencode", action="store_true", help="Set URL Encoding for payload generator")
+
+    # ---------------------------------- [ SQL Injection Parsing ] -----------------------------------------
+    
+    sqli_parser = subparsers.add_parser("sqli", help="SQL Injection Payloads")
+    
+    sqli_payload_selector = sqli_parser.add_argument_group("SQL Injection Payload Types") 
+    sqli_payload_selector.add_argument("--error-based", dest="error_based", action="store_true", help="Generate Error Based payloads")
+    sqli_payload_selector.add_argument("--time-based", dest="time_based", action="store_true", help="Generate Time Based payloads")
+    sqli_payload_selector.add_argument("--union-based", dest="union_based", action="store_true", help="Generate Union Based payloads")
+    sqli_payload_selector.add_argument("--auth-bypass", dest="auth_bypass", action="store_true", help="Generate Auth Bypass payloads")
+
+    sqli_options = sqli_parser.add_argument_group("SQL Injection Payload Options")
+    sqli_options.add_argument("--sleep-timeout", dest="sleep_timeout", type=int, metavar="", help="Set Sleep Timeout for payload genrating")
 
 
     return parser.parse_args()
@@ -189,7 +203,23 @@ def main():
         if args.oast_payloads:
             result_payloads.extend(ssti.generate_oast_payloads())
 
+    if args.payload_type == 'sqli':
+        if args.sleep_timeout: sleep_timeout = args.sleep_timeout
         
+        sqli = SQLIGenerator()
+        sqli.sleep_timeout = sleep_timeout
+        
+        if args.error_based:
+            result_payloads.extend(sqli.generate_error_based_payloads())
+        if args.time_based:
+            result_payloads.extend(sqli.generate_time_based_payloads())
+        if args.union_based:
+            result_payloads.extend(sqli.generate_union_select_payloads())
+        if args.auth_bypass:
+            result_payloads.extend(sqli.generate_auth_bypass())
+
+
+
     for payload in result_payloads:
         print(payload)
 
