@@ -9,6 +9,7 @@ from generators.ssti import TemplateInjectionGenerator
 from generators.sqli import SQLIGenerator
 from generators.ssi import SSIPayloadGenerator
 from generators.traversal import DirectoryTraversalPayloadGenerator
+from generators.htmli import HTMLInjectionPayloadGenerator
 
 
 def parse_arguments():
@@ -133,8 +134,8 @@ def parse_arguments():
 
     dt_payload_options = dt_parser.add_argument_group("File & Path Traversal Payload Options")
     dt_payload_options.add_argument("--depth", dest="traversal_depth", metavar="", type=int, default=8, help="Generated Traversal Depth")
-    dt_payload_options.add_argument("--custom-file", dest="custom_file", nargs="+", action="extend", help="Generated Traversal Depth")
-    dt_payload_options.add_argument("--custom-path", dest="custom_path", nargs="+", action="extend", help="Generated Traversal Depth")
+    dt_payload_options.add_argument("--custom-file", dest="custom_file", metavar="", nargs="+", action="extend", help="Generated Traversal Depth")
+    dt_payload_options.add_argument("--custom-path", dest="custom_path", metavar="", nargs="+", action="extend", help="Generated Traversal Depth")
 
     dt_platform_selector = dt_parser.add_argument_group("File & Path Traversal Platform Options")
     dt_platform_selector.add_argument("-w","--windows", dest="windows_platform", action="store_true", help="Generate Windows Based payloads")
@@ -142,6 +143,32 @@ def parse_arguments():
     
     dt_mutator = dt_parser.add_argument_group("File & Path Traversal Payload Mutations")
     dt_mutator.add_argument("--urlencode", dest="urlencode", action="store_true", help="Set URL Encoding for Payloads")
+
+    # ---------------------------------- [ HTML Injection Parsing ] -----------------------------------------
+    
+    htmli_parser = subparsers.add_parser("htmli", help="HTML Injection Payloads")
+    htmli_payload_selector = htmli_parser.add_argument_group("HTML Injection Payload Types")    
+    htmli_payload_selector.add_argument("--html-tags", dest="html_tags", action="store_true", help="Generate HTML tags")
+    htmli_payload_selector.add_argument("--html-events", dest="html_events", action="store_true", help="Generate HTML Events")
+    htmli_payload_selector.add_argument("--combo-list", dest="combo_list", action="store_true", help="Generate Combo List")
+
+
+    htmli_options = htmli_parser.add_argument_group("HTML Injection Payload Options")
+    #htmli_options.add_argument("--oast-domain", dest="oast_domain",  metavar="", help="Set OAST Domain for payload genrating")
+    htmli_options.add_argument("--unique-string", dest="unique_string", metavar="", help="Set Unique string for payload genrating")
+    htmli_options.add_argument("--tag", dest="html_tag", metavar="", nargs="+", action="extend", help="Set Unique TAG for payload genrating")
+    htmli_options.add_argument("--event", dest="html_event", metavar="", nargs="+", action="extend", help="Set Unique TAG for payload genrating")
+    htmli_options.add_argument("--include-id", dest="include_id", action="store_true", help="Include ID into payloads")
+    htmli_options.add_argument("--payload", dest="payloads", metavar="", nargs="+", action="extend", help="Add Custom Payloads")
+    
+
+
+    htmli_mutator = htmli_parser.add_argument_group("HTML Injection Payload Mutations")
+    htmli_mutator.add_argument("--urlencode", dest="urlencode", action="store_true", help="Set URL Encoding for Payloads")
+    htmli_mutator.add_argument("--strip-space", dest="stripspace", action="store_true", help="Change space in Payloads")
+    htmli_mutator.add_argument("--tag-breaking", dest="tag_breaking", action="store_true", help="Apply Tag Breaking")
+    htmli_mutator.add_argument("--null-byte", dest="null_byte", action="store_true", help="Apply Null Byte Injection")
+
 
     return parser.parse_args()
 
@@ -325,7 +352,34 @@ def main():
         if args.all_traversal:
             result_payloads.extend(dt.generate_all_payloads())
 
+    if args.payload_type == 'htmli':
+        
+        htmli = HTMLInjectionPayloadGenerator()
+        htmli.unique_string = unique_string
+        htmli.domain = oast_domain
+        if args.urlencode: htmli.url_encode_payloads = True 
+        #if args.oast_domain: htmli.domain = args.oast_domain
+        if args.unique_string: htmli.unique_string = args.unique_string
+        if args.stripspace: htmli.change_spaces = True
+        if args.include_id: htmli.include_id = True
+        if args.tag_breaking: htmli.tag_break = True
+        if args.null_byte: htmli.null_byte = True
 
+        if args.html_tag:
+            htmli.html_tags = args.html_tag
+        if args.html_event:
+            htmli.html_events = args.html_event
+        if args.payloads:
+            htmli.custom_payloads = args.payloads 
+
+
+
+        if args.html_tags:
+            result_payloads.extend(htmli.get_html_tags())
+        if args.html_events:
+            result_payloads.extend(htmli.get_html_attributes())
+        if args.combo_list:
+            result_payloads.extend(htmli.generate_all_tags_all_attributes())
 
 
     for payload in result_payloads:

