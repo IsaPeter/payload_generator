@@ -81,7 +81,7 @@ def parse_arguments():
     
     
     ssti_mutator = ssti_parser.add_argument_group("Server Side Template Injection Payload Mutations")
-    #ssti_mutator.add_argument("--urlencode",dest="urlencode", action="store_true", help="Set URL Encoding for payload generator")
+    ssti_mutator.add_argument("--urlencode",dest="urlencode", action="store_true", help="Set URL Encoding for payload generator")
 
 
     return parser.parse_args()
@@ -141,7 +141,6 @@ def main():
 
         result_payloads.extend(php.generate_payloads())
 
-
     if args.payload_type == 'ored':
         if args.oast_domain: oast_domain = args.oast_domain
         if args.unique_string: unique_string = args.unique_string
@@ -170,9 +169,10 @@ def main():
         ssti.sleep_timeout = sleep_timeout
         if args.number: ssti.number = args.number
         if args.multiply: ssti.multiply_string = args.multiply
+        if args.urlencode: ssti.url_encode_payloads = True 
         
         if args.windows_platform and args.linux_platform or not args.linux_platform and not args.windows_platform:
-            ssti.platforms = ['linux', 'lindows']
+            ssti.platforms = ['linux', 'windows']
         
         if args.windows_platform and not args.linux_platform:
             ssti.platforms = ["windows"]
@@ -183,7 +183,11 @@ def main():
         if args.reflective_payloads:
             result_payloads.extend(ssti.generate_reflective_payloads())
         
+        if args.timeout_payloads:
+            result_payloads.extend(ssti.generate_time_based_payloads())
 
+        if args.oast_payloads:
+            result_payloads.extend(ssti.generate_oast_payloads())
 
         
     for payload in result_payloads:
