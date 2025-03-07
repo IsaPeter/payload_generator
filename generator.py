@@ -160,6 +160,7 @@ def parse_arguments():
     htmli_options.add_argument("--event", dest="html_event", metavar="", nargs="+", action="extend", help="Set Unique TAG for payload genrating")
     htmli_options.add_argument("--include-id", dest="include_id", action="store_true", help="Include ID into payloads")
     htmli_options.add_argument("--payload", dest="payloads", metavar="", nargs="+", action="extend", help="Add Custom Payloads")
+    htmli_options.add_argument("--srcx", dest="set_src", action="store_true", help="Add src Attribute to the Payloads")
     
 
 
@@ -364,6 +365,7 @@ def main():
         if args.include_id: htmli.include_id = True
         if args.tag_breaking: htmli.tag_break = True
         if args.null_byte: htmli.null_byte = True
+        if args.set_src: htmli.set_src = True
 
         if args.html_tag:
             htmli.html_tags = args.html_tag

