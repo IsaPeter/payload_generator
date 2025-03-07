@@ -10,6 +10,7 @@ from generators.sqli import SQLIGenerator
 from generators.ssi import SSIPayloadGenerator
 from generators.traversal import DirectoryTraversalPayloadGenerator
 from generators.htmli import HTMLInjectionPayloadGenerator
+from generators.command import OSCommandInjectionPayloadGenerator
 
 
 def parse_arguments():
@@ -169,6 +170,29 @@ def parse_arguments():
     htmli_mutator.add_argument("--strip-space", dest="stripspace", action="store_true", help="Change space in Payloads")
     htmli_mutator.add_argument("--tag-breaking", dest="tag_breaking", action="store_true", help="Apply Tag Breaking")
     htmli_mutator.add_argument("--null-byte", dest="null_byte", action="store_true", help="Apply Null Byte Injection")
+
+
+     # ---------------------------------- [ OS Command Injection Parsing ] -----------------------------------------
+    
+    os_parser = subparsers.add_parser("os", help="OS Command Injection Payloads")
+    os_payload_selector = os_parser.add_argument_group("OS Command Injection Payload Types") 
+    os_payload_selector.add_argument("--reflective", dest="reflective_payloads", action="store_true", help="Generate Reflective Payloads")
+    os_payload_selector.add_argument("--time-based", dest="timebased_payloads", action="store_true", help="Generate Time-Based Payloads")
+    os_payload_selector.add_argument("--oast", dest="oast_payloads", action="store_true", help="Generate OAST Payloads")
+
+    os_payload_options = os_parser.add_argument_group("OS Command Injection Payload Options")
+    os_payload_options.add_argument("--unique-string", dest="unique_string", metavar="", help="Set Unique String")
+    os_payload_options.add_argument("--sleep-timeout", dest="sleep_timeout", metavar="", help="Set Sleep Timeout")
+    os_payload_options.add_argument("--oast-domain", dest="oast_domain", metavar="", help="Set OAST Domain")
+    
+    os_platform_selector = os_parser.add_argument_group("OS Command Injection Platform Options")
+    os_platform_selector.add_argument("-w","--windows", dest="windows_platform", action="store_true", help="Generate Windows Based payloads")
+    os_platform_selector.add_argument("-l","--linux", dest="linux_platform", action="store_true", help="Generate Linux Based payloads")
+
+    os_mutator = os_parser.add_argument_group("OS Command Injection Payload Mutation Options")
+    os_mutator.add_argument("--urlencode", dest="urlencode", action="store_true", help="URL Encode the payloads")
+    os_mutator.add_argument("--wildcard", dest="wildcard_bypass", action="store_true", help="Wildcard Bypass Linux Reflective payloads")
+    os_mutator.add_argument("--waf", dest="waf_bypass", action="store_true", help="Apply Waf Bypass")
 
 
     return parser.parse_args()
@@ -383,10 +407,44 @@ def main():
         if args.combo_list:
             result_payloads.extend(htmli.generate_all_tags_all_attributes())
 
+    if args.payload_type == 'os':
+        if args.oast_domain: oast_domain = args.oast_domain
+        if args.unique_string: unique_string = args.unique_string
+        if args.sleep_timeout: sleep_timeout = args.sleep_timeout
+        
+        os = OSCommandInjectionPayloadGenerator()
+        os.unique_string = unique_string
+        os.domain = oast_domain
+        os.sleep_timeout = sleep_timeout
+        if args.urlencode: os.url_encode_payload = True 
+        if args.wildcard_bypass: os.wildcard_bypass = True
+        if args.waf_bypass: os.waf = True
+
+
+
+        if args.windows_platform and args.linux_platform or not args.linux_platform and not args.windows_platform:
+            os.platforms = ['linux', 'windows']
+        
+        if args.windows_platform and not args.linux_platform:
+            os.platforms = ["windows"]
+        
+        if not args.windows_platform and args.linux_platform:
+            os.platforms = ["linux"]
+
+        if args.reflective_payloads:
+            result_payloads.extend(os.generate_reflection_payloads())
+        
+        if args.timebased_payloads:
+            result_payloads.extend(os.generate_time_payloads())
+
+        if args.oast_payloads:
+            result_payloads.extend(os.generate_oast_payloads())
+
+
 
     for payload in result_payloads:
         print(payload)
-
+        
 
 if __name__ == '__main__':
     main()
