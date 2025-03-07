@@ -7,6 +7,7 @@ from generators.php import PHPCodeInjectionGenerator
 from generators.ored import OpenRedirectionPayloadGenerator
 from generators.ssti import TemplateInjectionGenerator
 from generators.sqli import SQLIGenerator
+from generators.ssi import SSIPayloadGenerator
 
 
 def parse_arguments():
@@ -97,6 +98,27 @@ def parse_arguments():
     sqli_options = sqli_parser.add_argument_group("SQL Injection Payload Options")
     sqli_options.add_argument("--sleep-timeout", dest="sleep_timeout", type=int, metavar="", help="Set Sleep Timeout for payload genrating")
 
+    # ---------------------------------- [ SSI Parsing ] -----------------------------------------
+    
+    ssi_parser = subparsers.add_parser("ssi", help="SSI Payloads")
+    
+    ssi_payload_selector = ssi_parser.add_argument_group("SSI Payload Types") 
+    ssi_payload_selector.add_argument("--reflective", dest="reflective_payloads", action="store_true", help="Generate Reflective payloads")
+    ssi_payload_selector.add_argument("--time-based", dest="timeout_payloads", action="store_true", help="Generate Time Based payloads")
+    ssi_payload_selector.add_argument("--oast", dest="oast_payloads", action="store_true", help="Generate OAST payloads")
+
+    ssi_options = ssi_parser.add_argument_group("SSI Payload Options")
+    ssi_options.add_argument("--sleep-timeout", dest="sleep_timeout", type=int, metavar="", help="Set Sleep Timeout for payload genrating")
+    ssi_options.add_argument("--oast-domain", dest="oast_domain",  metavar="", help="Set OAST Domain for payload genrating")
+    ssi_options.add_argument("--unique-string", dest="unique_string", metavar="", help="Set Unique string for payload genrating")
+    
+    ssi_platform_selector = ssi_parser.add_argument_group("SSI Platform Options")
+    ssi_platform_selector.add_argument("-w","--windows", dest="windows_platform", action="store_true", help="Generate Windows Based payloads")
+    ssi_platform_selector.add_argument("-l","--linux", dest="linux_platform", action="store_true", help="Generate Linux Based payloads")
+    
+    
+    ssi_mutator = ssi_parser.add_argument_group("SSI Payload Mutations")
+    ssi_mutator.add_argument("--urlencode",dest="urlencode", action="store_true", help="Set URL Encoding for payload generator")
 
     return parser.parse_args()
 
@@ -217,6 +239,35 @@ def main():
             result_payloads.extend(sqli.generate_union_select_payloads())
         if args.auth_bypass:
             result_payloads.extend(sqli.generate_auth_bypass())
+
+    if args.payload_type == 'ssi':
+        if args.oast_domain: oast_domain = args.oast_domain
+        if args.unique_string: unique_string = args.unique_string
+        if args.sleep_timeout: sleep_timeout = args.sleep_timeout
+        
+        ssi = SSIPayloadGenerator()
+        ssi.unique_string = unique_string
+        ssi.domain = oast_domain
+        ssi.sleep_timeout = sleep_timeout
+        if args.urlencode: ssi.url_encode_payloads = True 
+        
+        if args.windows_platform and args.linux_platform or not args.linux_platform and not args.windows_platform:
+            ssi.platforms = ['linux', 'windows']
+        
+        if args.windows_platform and not args.linux_platform:
+            ssi.platforms = ["windows"]
+        
+        if not args.windows_platform and args.linux_platform:
+            ssi.platforms = ["linux"]
+
+        if args.reflective_payloads:
+            result_payloads.extend(ssi.generate_reflective_payloads())
+        
+        if args.timeout_payloads:
+            result_payloads.extend(ssi.generate_time_based_payloads())
+
+        if args.oast_payloads:
+            result_payloads.extend(ssi.generate_oast_payloads())
 
 
 

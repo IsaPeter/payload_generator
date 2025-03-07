@@ -5,9 +5,9 @@ Payload Generator Tool. These payloads are only help to detect the vulnerability
 - [x] SSTI Payload Generation
 - [ ] HTML Injection Payload Generation
 - [x] Open Redirection Payload Generation
-- [ ] SQL Injection Payload Generation
+- [x] SQL Injection Payload Generation
 - [ ] Command Injection Payload Generation
-- [ ] SSI Injection Payload Generation
+- [x] SSI Injection Payload Generation
 - [x] PHP Code Injection Payload Generation
 
 
@@ -221,3 +221,31 @@ SQL Injection Payload Options:
 ```
 
 
+## Server-Side Script Include (SSI)
+
+
+### Help
+
+```bash
+usage: generator.py ssi [-h] [--reflective] [--time-based] [--oast] [--sleep-timeout] [--oast-domain] [--unique-string] [-w] [-l] [--urlencode]
+
+options:
+  -h, --help        show this help message and exit
+
+SSI Payload Types:
+  --reflective      Generate Reflective payloads
+  --time-based      Generate Time Based payloads
+  --oast            Generate OAST payloads
+
+SSI Payload Options:
+  --sleep-timeout   Set Sleep Timeout for payload genrating
+  --oast-domain     Set OAST Domain for payload genrating
+  --unique-string   Set Unique string for payload genrating
+
+SSI Platform Options:
+  -w, --windows     Generate Windows Based payloads
+  -l, --linux       Generate Linux Based payloads
+
+SSI Payload Mutations:
+  --urlencode       Set URL Encoding for payload generator
+```
