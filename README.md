@@ -10,6 +10,7 @@ Payload Generator Tool. These payloads are only help to detect the vulnerability
 - [x] SSI Injection Payload Generation
 - [x] PHP Code Injection Payload Generation
 - [x] File & Path Traversal Payload Generation
+- [x] Upload File Name Payload Generation
 
 
 ## XSS Payloads
@@ -377,4 +378,47 @@ $type C:\Windows\System32\drivers\etc\hosts$
 \tcat /etc/passwd!
 &type C:\Windows\System32\drivers\etc\hosts|
 "type C:\Windows\System32\drivers\etc\hosts%0a
+```
+
+
+## Uplod File Name Payload Generation
+
+### Help
+
+```bash
+usage: generator.py upload [-h] [--php] [--asp] [--jsp] [--perl] [--coldfusion] [--node] [--custom] [-a] [-c  [...]] [-d] [-f] [--swapcase] [--double] [--nullname] [--dotname] [--slashname] [--all] [--path-traversal]
+                           [--command-injection]
+
+options:
+  -h, --help            show this help message and exit
+
+File Extension Options:
+  --php                 Generate PHP extensions
+  --asp                 Generate ASP extensions
+  --jsp                 Generate JSP extensions
+  --perl                Generate Perl extensions
+  --coldfusion          Generate Coldfusion extensions
+  --node                Generate NODE JS extensions
+  --custom              Generate Custom extensions
+  -a , --alowed-extensions 
+                        Set Allowed Extensions
+
+Upload File Name Payload Options:
+  -c  [ ...], --command  [ ...]
+                        Add commands for Command injection
+  -d , --depth          Set Path Traversal Max depth.
+  -f , --original-filename 
+                        Set Original Filename
+
+Upload File Name Payload Generators:
+  --swapcase            Swapping case in extension randomly
+  --double              Double the extensions
+  --nullname            Insert null characters into the filename
+  --dotname             Insert dots after the filename
+  --slashname           Insert slashes into the extensions
+  --all                 Generate All Payloads
+
+Upload File Name Vulnerability Generators:
+  --path-traversal      Generate Path Traversal Filenames
+  --command-injection   Generate Command Injection Filenames
 ```

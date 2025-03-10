@@ -11,7 +11,7 @@ from generators.ssi import SSIPayloadGenerator
 from generators.traversal import DirectoryTraversalPayloadGenerator
 from generators.htmli import HTMLInjectionPayloadGenerator
 from generators.command import OSCommandInjectionPayloadGenerator
-
+from generators.upfile import UploadFileNameGenerator
 
 def parse_arguments():
     parser = ArgumentParser(description="Payload Generator")
@@ -193,6 +193,39 @@ def parse_arguments():
     os_mutator.add_argument("--urlencode", dest="urlencode", action="store_true", help="URL Encode the payloads")
     os_mutator.add_argument("--wildcard", dest="wildcard_bypass", action="store_true", help="Wildcard Bypass Linux Reflective payloads")
     os_mutator.add_argument("--waf", dest="waf_bypass", action="store_true", help="Apply Waf Bypass")
+
+    # ---------------------------------- [ Upload Filename Parsing ] -----------------------------------------
+
+    upload_parser = subparsers.add_parser("upload", help="Upload File Name Payloads")
+    upload_extension_selector = upload_parser.add_argument_group("File Extension Options")
+    upload_extension_selector.add_argument("--php", dest="php_extension", action="store_true", help="Generate PHP extensions")
+    upload_extension_selector.add_argument("--asp", dest="asp_extension", action="store_true", help="Generate ASP extensions")
+    upload_extension_selector.add_argument("--jsp", dest="jsp_extension", action="store_true", help="Generate JSP extensions")
+    upload_extension_selector.add_argument("--perl", dest="perl_extension", action="store_true", help="Generate Perl extensions")
+    upload_extension_selector.add_argument("--coldfusion", dest="coldfusion_extension", action="store_true", help="Generate Coldfusion extensions")
+    upload_extension_selector.add_argument("--node", dest="node_extension", action="store_true", help="Generate NODE JS extensions")
+    upload_extension_selector.add_argument("--custom", dest="custom_extension", metavar="", help="Generate Custom extensions")
+    upload_extension_selector.add_argument("-a","--alowed-extensions", dest="allowed_extensions", metavar="" , help="Set Allowed Extensions")
+
+    upload_payload_options = upload_parser.add_argument_group("Upload File Name Payload Options")
+    upload_payload_options.add_argument("-c","--command", dest="command", metavar="", nargs="+", action="extend", help="Add commands for Command injection")
+    upload_payload_options.add_argument("-d", "--depth", dest="depth", type=int, metavar="", help="Set Path Traversal Max depth.")
+    upload_payload_options.add_argument("-f", "--original-filename", dest="original_filename", metavar="", help="Set Original Filename")
+
+
+    upload_payload_generators = upload_parser.add_argument_group("Upload File Name Payload Generators")
+    upload_payload_generators.add_argument("--swapcase", dest="swapcase", action="store_true", help="Swapping case in extension randomly")
+    upload_payload_generators.add_argument("--double", dest="double", action="store_true", help="Double the extensions")
+    upload_payload_generators.add_argument("--nullname", dest="nullname", action="store_true", help="Insert null characters into the filename")
+    upload_payload_generators.add_argument("--dotname", dest="dotname", action="store_true", help="Insert dots after the filename")
+    upload_payload_generators.add_argument("--slashname", dest="slashname", action="store_true", help="Insert slashes into the extensions")
+    upload_payload_generators.add_argument("--all", dest="all_payloads", action="store_true", help="Generate All Payloads")
+
+
+    upload_vuln_generators = upload_parser.add_argument_group("Upload File Name Vulnerability Generators")
+    upload_vuln_generators.add_argument("--path-traversal", dest="path_traversal", action="store_true", help="Generate Path Traversal Filenames")
+    upload_vuln_generators.add_argument("--command-injection", dest="command_injection", action="store_true", help="Generate Command Injection Filenames")
+    
 
 
     return parser.parse_args()
@@ -439,6 +472,40 @@ def main():
 
         if args.oast_payloads:
             result_payloads.extend(os.generate_oast_payloads())
+
+    if args.payload_type == 'upload':
+        
+        upload = UploadFileNameGenerator()
+        if args.original_filename: upload.base_filename = args.original_filename
+        if args.php_extension: upload.generate_php = True
+        if args.asp_extension: upload.generate_asp = True
+        if args.jsp_extension: upload.generate_jsp = True
+        if args.perl_extension: upload.generate_perl = True
+        if args.coldfusion_extension: upload.generate_coldfusion = True
+        if args.node_extension: upload.generate_nodejs = True
+        if args.custom_extension: 
+            upload.custom_extensions = [ a.strip() for a in args.custom_extension.split(',')] if "," in args.custom_extension else [args.custom_extension.strip()] 
+            upload.generate_custom = True 
+        if args.allowed_extensions:
+            upload.allowed_extensions = [ a.strip() for a in args.allowed_extensions.split(',')] if "," in args.allowed_extensions else [args.allowed_extensions.strip()]
+
+        if args.command: upload.commands = args.command 
+        if args.depth: upload.max_depth = args.depth
+
+        if args.swapcase: upload.swapcase = True
+        if args.double: upload.double = True
+        if args.nullname: upload.nullnames= True
+        if args.dotname: upload.dotnames = True
+        if args.slashname: upload.slashnames=True
+        if args.path_traversal: upload.path_traversal = True
+        if args.command_injection: upload.command_injection = True
+
+
+
+        if args.all_payloads:
+            result_payloads.extend(upload.generate_all_payloads())
+        else:
+            result_payloads.extend(upload.generate_payloads())
 
 
 
